@@ -37,15 +37,14 @@ export default function PortfolioPage() {
           <section className="flex flex-col gap-16 lg:w-2/3 lg:pt-2">
             <div className="flex flex-col gap-6">
               <h2 className="text-xl font-semibold tracking-tight">
-                The Founders
+                Pendiri (Founders)
               </h2>
-
               <BrandCards />
             </div>
 
             <div className="flex flex-col gap-6">
               <h2 className="text-xl font-semibold tracking-tight">
-                1% Better Vault
+                Perpustakaan 1% (Apps Gratis)
               </h2>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <AppCard
@@ -57,6 +56,13 @@ export default function PortfolioPage() {
                   iconDivClassName="bg-secondary"
                 />
               </div>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              <h2 className="text-xl font-semibold tracking-tight">
+                Proyek Sebelumnya
+              </h2>
+              <BrandCards discontinued />
             </div>
           </section>
         </div>

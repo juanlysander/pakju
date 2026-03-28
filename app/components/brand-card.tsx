@@ -1,9 +1,33 @@
-import EntralokaIcon from "@/assets/brand/entraloka"
-import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
 import { ArrowUpRight } from "lucide-react"
 
-const BrandCards = () => {
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+
+const BrandCards = ({ discontinued }: { discontinued?: boolean }) => {
+  if (discontinued)
+    return (
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <Card className="p-6">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <a
+                className="group mb-1 flex items-center gap-2 text-base font-medium underline transition-colors group-hover:text-primary"
+                href={"https://rocketalpha.vercel.app/stock-analysis/ICBP"}
+              >
+                Rocket Alpha
+                <ArrowUpRight className="size-4 opacity-50 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
+              </a>
+              <Badge variant="secondary">Pending</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Platform Workflow Analisa Fundamental Saham yang terstruktur untuk
+              memudahkan user membaca laporan keuangan dan metriks-metriksnya
+            </p>
+          </div>
+        </Card>
+      </div>
+    )
+
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <Card className="p-6">
