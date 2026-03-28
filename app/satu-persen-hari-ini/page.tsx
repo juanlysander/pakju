@@ -80,6 +80,9 @@ export default async function SatuPersenHariIniPage({
                   Rangkuman bacaan bisnis 15 menit sehari untuk bantu usahamu
                   tumbuh.
                 </p>
+                <p className="text-lg leading-relaxed text-muted-foreground">
+                  Gw tantang kalian untuk belajar 1 bulan tanpa bolong!
+                </p>
               </div>
             </div>
             <SocialLinks />
