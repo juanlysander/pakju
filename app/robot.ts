@@ -1,12 +1,12 @@
-import { MetadataRoute } from 'next'
+import { MetadataRoute } from "next"
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: '/api/', // Menutup akses ke route API jika ada
+      userAgent: "*",
+      allow: "/",
+      disallow: "/api/",
     },
-    sitemap: 'https://pakju.com/sitemap.xml', // Sesuaikan dengan domain kamu
+    sitemap: "https://pakju.com/sitemap.xml",
   }
 }
