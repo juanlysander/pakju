@@ -17,6 +17,8 @@
 
 # production
 /build
+.notes
+.vscode
 
 # misc
 .DS_Store
