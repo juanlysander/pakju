@@ -8,7 +8,8 @@ import Link from "next/link"
 import pakju from "@/assets/pakju.jpg"
 import SocialLinks from "@/components/shared/social-links"
 import { Card } from "@/components/ui/card"
-import { getAllPosts } from "@/lib/markdown"
+import Article from "@/lib/models"
+import { dbConnect } from "@/lib/mongo-db"
 import SearchBar from "./components/search-bar"
 
 export const metadata: Metadata = {
@@ -36,25 +37,30 @@ export default async function SatuPersenHariIniPage({
   searchParams: Promise<{ q?: string }>
 }) {
   const searcParamsRes = await searchParams
-  const query = searcParamsRes?.q?.toLowerCase() || ""
-  const allPosts = getAllPosts()
+  const query = searcParamsRes?.q || ""
 
-  // Filter artikel berdasarkan judul, deskripsi, isi konten, atau tanggal
-  const filteredPosts = allPosts.filter((post) => {
-    if (!query) return true
-    return (
-      post.title.toLowerCase().includes(query) ||
-      post.description.toLowerCase().includes(query) ||
-      post.content.toLowerCase().includes(query) ||
-      post.date.includes(query)
-    )
-  })
+  await dbConnect()
+
+  const dbFilter: any = { isPublished: true }
+
+  if (query) {
+    dbFilter.$or = [
+      { title: { $regex: query, $options: "i" } },
+      { excerpt: { $regex: query, $options: "i" } },
+      { content: { $regex: query, $options: "i" } },
+    ]
+  }
+
+  const posts = await Article.find(dbFilter)
+    .select("title slug excerpt createdAt tags")
+    .sort({ createdAt: -1 })
+    .lean()
 
   return (
     <main className="min-h-screen bg-background pb-24 text-foreground">
       <div className="mx-auto max-w-5xl px-6 py-12 lg:px-8 lg:py-24">
         <div className="relative flex flex-col gap-12 lg:flex-row lg:gap-20">
-          {/* KOLOM KIRI (Sama seperti Homepage) */}
+          {/* KOLOM KIRI */}
           <section className="flex h-fit flex-col gap-8 lg:sticky lg:top-24 lg:w-1/3">
             <div className="flex flex-col gap-6">
               <Link
@@ -97,8 +103,8 @@ export default async function SatuPersenHariIniPage({
 
             {/* List Artikel */}
             <div className="flex flex-col gap-4">
-              {filteredPosts.length > 0 ? (
-                filteredPosts.map((post) => (
+              {posts.length > 0 ? (
+                posts.map((post: any) => (
                   <Link
                     key={post.slug}
                     href={`/satu-persen-hari-ini/${post.slug}`}
@@ -110,11 +116,15 @@ export default async function SatuPersenHariIniPage({
                         </h3>
                         <ArrowUpRight className="h-5 w-5 shrink-0 text-muted-foreground opacity-50 transition-all group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:opacity-100" />
                       </div>
+
+                      {/* Menggunakan excerpt sebagai ganti description */}
                       <p className="line-clamp-2 text-sm text-muted-foreground">
-                        {post.description}
+                        {post.excerpt}
                       </p>
+
+                      {/* Menggunakan createdAt sebagai ganti date */}
                       <time className="pt-2 text-xs font-medium tracking-wider text-muted-foreground/70 uppercase">
-                        {format(new Date(post.date), "d MMMM yyyy", {
+                        {format(new Date(post.createdAt), "d MMMM yyyy", {
                           locale: id,
                         })}
                       </time>

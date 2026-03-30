@@ -1,21 +1,24 @@
 import { MetadataRoute } from "next"
-import fs from "fs"
-import path from "path"
 
-export default function sitemap(): MetadataRoute.Sitemap {
+import { dbConnect } from "@/lib/mongo-db"
+import Article from "@/lib/models"
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://pakju.com"
 
-  const contentPath = path.join(process.cwd(), "content/satu-persen-hari-ini")
+  await dbConnect()
 
-  const articleSlugs = fs
-    .readdirSync(contentPath)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => ({
-      url: `${baseUrl}/satu-persen-hari-ini/${file.replace(".md", "")}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }))
+  const articles = await Article.find({ isPublished: true })
+    .select("slug updatedAt")
+    .lean()
+
+  const articlePages: MetadataRoute.Sitemap = articles.map((article: any) => ({
+    url: `${baseUrl}/satu-persen-hari-ini/${article.slug}`,
+
+    lastModified: article.updatedAt || new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }))
 
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -32,5 +35,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  return [...staticPages, ...articleSlugs]
+  return [...staticPages, ...articlePages]
 }

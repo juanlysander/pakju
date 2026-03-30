@@ -1,23 +1,36 @@
-import { ImageResponse } from 'next/og'
-import { getPostBySlug } from '@/lib/markdown'
-import fs from 'fs'
-import path from 'path'
+import { ImageResponse } from "next/og"
+import fs from "fs"
+import path from "path"
+
+import Article from "@/lib/models"
+import { dbConnect } from "@/lib/mongo-db"
 
 export const alt = "Satu Persen Hari Ini Thumbnail"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
-const fontOxanium = fetch(
-  new URL("../../fonts/Oxanium-VariableFont_wght.ttf", import.meta.url)
-).then((res) => res.arrayBuffer())
+const fontPath = path.join(
+  process.cwd(),
+  "app/fonts/Oxanium-VariableFont_wght.ttf"
+)
+const fontData = fs.readFileSync(fontPath)
 
-export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-  const resolvedParams = await params;
-  const post = getPostBySlug(resolvedParams.slug)
-  const fontPath = path.join(process.cwd(), 'app/fonts/Oxanium-VariableFont_wght.ttf')
-  const fontData = fs.readFileSync(fontPath)
+export default async function Image({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const resolvedParams = await params
 
-  const title = post?.title || '1% Hari Ini'
+  await dbConnect()
+  const post = await Article.findOne({
+    slug: resolvedParams.slug,
+    isPublished: true,
+  })
+    .select("title")
+    .lean()
+
+  const title = post?.title || "1% Hari Ini"
 
   return new ImageResponse(
     <div
@@ -40,7 +53,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           fontWeight: 700,
           textTransform: "uppercase",
           letterSpacing: "0.1em",
-          color: "#000000", // Hitam Pekat
+          color: "#000000",
           marginBottom: "40px",
         }}
       >

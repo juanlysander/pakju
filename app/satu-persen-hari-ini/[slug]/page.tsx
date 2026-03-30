@@ -1,18 +1,29 @@
 import { format } from "date-fns"
 import { id } from "date-fns/locale"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, LogOutIcon } from "lucide-react"
 import { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import ReactMarkdown from "react-markdown"
 
 import { Button } from "@/components/ui/button"
-import { getAllPosts, getPostBySlug } from "@/lib/markdown"
+import { dbConnect } from "@/lib/mongo-db"
+import Article, { IArticle } from "@/lib/models"
+
+export const revalidate = 1200
+export const dynamicParams = true
 
 export async function generateStaticParams() {
-  const posts = getAllPosts()
-  return posts.map((post) => ({
-    slug: post.slug,
+  await dbConnect()
+
+  const recentArticles = await Article.find({ isPublished: true })
+    .select("slug")
+    .sort({ createdAt: -1 })
+    .limit(20)
+    .lean()
+
+  return recentArticles.map((article: any) => ({
+    slug: article.slug,
   }))
 }
 
@@ -22,7 +33,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const paramsRes = await params
-  const post = getPostBySlug(paramsRes.slug)
+
+  await dbConnect()
+  const post = (await Article.findOne({
+    slug: paramsRes.slug,
+    isPublished: true,
+  }).lean()) as IArticle | null
 
   if (!post) {
     return {
@@ -33,18 +49,18 @@ export async function generateMetadata({
 
   return {
     title: `${post.title} | 1% Hari Ini`,
-    description: post.description,
+    description: post.excerpt,
     openGraph: {
       title: post.title,
-      description: post.description,
+      description: post.excerpt,
       type: "article",
-      publishedTime: post.date,
+      publishedTime: post?.createdAt?.toISOString(),
       url: `https://pakju.com/satu-persen-hari-ini/${post.slug}`,
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: post.description,
+      description: post.excerpt,
     },
   }
 }
@@ -55,24 +71,49 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>
 }) {
   const paramsRes = await params
-  const post = getPostBySlug(paramsRes.slug)
+
+  await dbConnect()
+
+  const post = (await Article.findOne({
+    slug: paramsRes.slug,
+    isPublished: true,
+  }).lean()) as IArticle | null
+
   if (!post) notFound()
 
-  // Ambil 10 artikel terbaru untuk sidebar, kecualikan artikel yang sedang dibaca
-  const allPosts = getAllPosts()
-  const recentPosts = allPosts
-    .filter((p) => p.slug !== paramsRes.slug)
-    .slice(0, 4)
+  const recentPosts = (await Article.find({
+    slug: { $ne: paramsRes.slug },
+    isPublished: true,
+  })
+    .select("title slug createdAt")
+    .sort({ createdAt: -1 })
+    .limit(4)
+    .lean()) as Pick<IArticle, "title" | "slug" | "createdAt">[]
 
   return (
     <main className="min-h-screen bg-background pb-24 text-foreground">
       <div className="mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
+        <div className="mb-10">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="-ml-3 gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <Link href="/satu-persen-hari-ini">
+              <LogOutIcon className="w-3.5!" />
+              Kembali ke Daftar
+            </Link>
+          </Button>
+        </div>
+
         <div className="relative flex flex-col gap-16 lg:flex-row lg:gap-24">
           {/* KOLOM KIRI: Konten Artikel Utama */}
           <article className="lg:w-2/3">
             <header className="mb-10 space-y-4">
               <time className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
-                {format(new Date(post.date), "d MMMM yyyy", {
+                {/* Update post.date -> post.createdAt */}
+                {format(new Date(post.createdAt!), "d MMMM yyyy", {
                   locale: id,
                 })}
               </time>
@@ -81,13 +122,13 @@ export default async function BlogPostPage({
               </h1>
             </header>
 
-            {/* Area render Markdown. Menggunakan class 'prose' dari Tailwind Typography */}
+            {/* Area render Markdown tetap sama */}
             <div className="prose max-w-none prose-neutral dark:prose-invert prose-headings:font-semibold prose-a:text-primary hover:prose-a:text-primary/80">
               <ReactMarkdown>{post.content}</ReactMarkdown>
             </div>
           </article>
 
-          {/* KOLOM KANAN: Minimalist Sidebar Navigation */}
+          {/* KOLOM KANAN: Sidebar */}
           <aside className="flex h-fit flex-col gap-8 lg:sticky lg:top-24 lg:w-1/3">
             <div className="space-y-6">
               <h3 className="pb-4 text-sm font-semibold text-muted-foreground uppercase">
@@ -105,11 +146,15 @@ export default async function BlogPostPage({
                       {recentPost.title}
                     </h4>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(recentPost.date).toLocaleDateString("id-ID", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      {/* Update recentPost.date -> recentPost.createdAt */}
+                      {new Date(recentPost.createdAt!).toLocaleDateString(
+                        "id-ID",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      )}
                     </span>
                   </Link>
                 ))}
@@ -117,8 +162,8 @@ export default async function BlogPostPage({
 
               <div className="pt-4">
                 <Button
-                  variant="ghost"
-                  className="group w-full justify-between text-muted-foreground hover:text-foreground"
+                  variant="outline"
+                  className="group w-full justify-between rounded-xl text-muted-foreground hover:text-foreground"
                   asChild
                 >
                   <Link href="/satu-persen-hari-ini">
