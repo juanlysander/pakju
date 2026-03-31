@@ -57,8 +57,8 @@ export default async function SatuPersenHariIniPage({
     .lean()
 
   return (
-    <main className="min-h-screen bg-background pb-24 text-foreground">
-      <div className="mx-auto max-w-5xl px-6 py-12 lg:px-8 lg:py-24">
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-5xl px-6 py-12 lg:px-8 lg:pt-24 lg:pb-36">
         <div className="relative flex flex-col gap-12 lg:flex-row lg:gap-20">
           {/* KOLOM KIRI */}
           <section className="flex h-fit flex-col gap-8 lg:sticky lg:top-24 lg:w-1/3">
