@@ -18,7 +18,7 @@ export function ThemeToggle({
   as?: "dropdown" | "toggle"
   className?: string
 }) {
-  const { setTheme, resolvedTheme } = useTheme()
+  const { setTheme } = useTheme()
 
   return (
     <DropdownMenu>
