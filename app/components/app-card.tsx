@@ -16,7 +16,7 @@ const AppCard = ({
 }: {
   title: string
   description: string
-  status: "live" | "pending" | "none"
+  status: "live" | "pending" | "none" | "on-progress"
   href: string
   icon?: ForwardRefExoticComponent<
     Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
@@ -43,20 +43,35 @@ const AppCard = ({
             <Badge variant="default">Live</Badge>
           ) : status === "pending" ? (
             <Badge variant="secondary" className="bg-muted">
-              Coming Soon
+              Soon
+            </Badge>
+          ) : status === "on-progress" ? (
+            <Badge variant="secondary" className="bg-muted">
+              On Progress
             </Badge>
           ) : null}
         </div>
-        <div>
-          <Link
-            className="group mb-1 flex items-center gap-2 text-base font-medium underline transition-colors group-hover:text-primary"
-            href={href}
-          >
-            {title}
-            <ArrowUpRight className="size-4 opacity-50 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
-          </Link>
-          <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
+        {status === "on-progress" || status === "pending" ? (
+          <div>
+            <h2 className="group mb-1 flex items-center gap-2 text-base font-medium text-muted-foreground">
+              {title}
+            </h2>
+            <p className="text-sm text-muted-foreground">{description}</p>
+          </div>
+        ) : (
+          <div>
+            <Link
+              className={
+                "group mb-1 flex items-center gap-2 text-base font-medium transition-colors hover:text-primary hover:underline"
+              }
+              href={href}
+            >
+              {title}
+              <ArrowUpRight className="size-4 opacity-50 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
+            </Link>
+            <p className="text-sm text-muted-foreground">{description}</p>
+          </div>
+        )}
       </div>
     </Card>
   )

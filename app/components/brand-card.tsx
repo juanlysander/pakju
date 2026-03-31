@@ -11,7 +11,7 @@ const BrandCards = ({ discontinued }: { discontinued?: boolean }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <a
-                className="group mb-1 flex items-center gap-2 text-base font-medium underline transition-colors group-hover:text-primary"
+                className="group mb-1 flex items-center gap-2 text-base font-medium transition-colors hover:text-primary hover:underline"
                 href={"https://rocketalpha.vercel.app/stock-analysis/ICBP"}
               >
                 Rocket Alpha
@@ -34,7 +34,7 @@ const BrandCards = ({ discontinued }: { discontinued?: boolean }) => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <a
-              className="group mb-1 flex items-center gap-2 text-base font-medium underline transition-colors group-hover:text-primary"
+              className="group mb-1 flex items-center gap-2 text-base font-medium transition-colors hover:text-primary hover:underline"
               href={"https://dearmylove.co"}
             >
               Dear My Love
@@ -51,7 +51,7 @@ const BrandCards = ({ discontinued }: { discontinued?: boolean }) => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3
-              className="group mb-1 flex items-center gap-2 text-base font-medium transition-colors group-hover:text-primary"
+              className="group mb-1 flex items-center gap-2 text-base font-medium text-muted-foreground transition-colors"
               // href={"https://entraloka.com"}
             >
               Entraloka

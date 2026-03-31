@@ -55,6 +55,14 @@ export default function PortfolioPage() {
                   icon={NotebookPen}
                   iconDivClassName="bg-secondary"
                 />
+                <AppCard
+                  title="Pakju Pro Invoicing"
+                  description="Aplikasi yang membantu kamu membuat tagihan / kwitansi secara cepat dan personal. Gunakan secara gratis tanpa limitasi apapun"
+                  status="on-progress"
+                  href="/invoicing"
+                  icon={NotebookPen}
+                  iconDivClassName="bg-secondary"
+                />
               </div>
             </div>
 
