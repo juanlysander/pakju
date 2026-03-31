@@ -29,17 +29,25 @@ const SocialLinks = () => {
         </Link>
       </Button>
       <Button variant="outline" size="icon" asChild className="rounded-full">
-        <Link href="https://tiktok.com/@juanlysander" target="_blank" aria-label="TikTok">
+        <Link
+          href="https://tiktok.com/@juanlysander"
+          target="_blank"
+          aria-label="TikTok"
+        >
           <TiktokIcon className="size-4.5! fill-current" />
         </Link>
       </Button>
       <Button variant="outline" size="icon" asChild className="rounded-full">
-        <Link href="https://youtube.com/@juanlysander" target="_blank" aria-label="YouTube">
+        <Link
+          href="https://youtube.com/@juanlysander"
+          target="_blank"
+          aria-label="YouTube"
+        >
           <YoutubeIcon className="size-4.5! fill-current" />
         </Link>
       </Button>
       <div className="mx-1 h-5 w-px bg-border" />
-      <ThemeToggle />
+      <ThemeToggle className="rounded-full size-8!" />
     </div>
   )
 }
